@@ -23,7 +23,7 @@ async def cmd_start(message: Message):
      
 @router.message(F.text == 'Каталог')
 async def catalog(message: Message):
-    await message.answer('Выберите категорию товара', reply_markup=await kb.categories())
+    await message.answer('Выберите категорию товаров:', reply_markup=await kb.categories())
     
     
 @router.callback_query(F.data.startswith('category_'))
@@ -36,7 +36,12 @@ async def category(callback: CallbackQuery):
 @router.callback_query(F.data.startswith('item_'))
 async def category(callback: CallbackQuery):
     item_data = await rq.gete_item(callback.data.split('_')[1])
-    await callback.answer('Вы выбрали товар')
+    await callback.answer(f'Вы выбрали товар - {item_data.name}')
     await callback.message.answer(f'Название: {item_data.name}\nОписание: {item_data.description}\nЦена: {item_data.price} ₽',
                                   reply_markup=await kb.items(callback.data.split('_')[1]))
- 
+    
+    
+@router.callback_query(F.data.startswith('to_main'))
+async def to_main_menu(callback: CallbackQuery):
+    await callback.answer('Вы вышли в главное меню')
+    await callback.message.answer('Выберите категорию товаров:', reply_markup=await kb.categories())
